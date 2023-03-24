@@ -12,7 +12,7 @@ import pandas as pd
 # 需要保留两位有效数字的列数据
 round_two_list = ["应收权益1-本利和", "房屋总价2", "抵债金额（总）", "剩余购房款（不含首付）",
                   "对应首付金额（元）", "乙方1产品1剩余本金", "乙方1产品1剩余收益",
-                  "乙方1产品1转让本金", "乙方1产品1转让收益", '房源建面']
+                  "乙方1产品1转让本金", "乙方1产品1转让收益", '房源建面', '剩余应付房款']
 
 def isNan(item):
     """
@@ -36,6 +36,18 @@ def preprocess_round_two(l):
             num = 0.0
         new_l.append(('%.2f'%num)) # 强转float时，会丢失.00这种2位小数，只能存成str，后期要运算再变回来
     return new_l
+
+def preprocess_productName(l):
+    """
+    对于一个list，# 替换所有的【】变成[]
+    """
+    new_l = []
+    for s in l:
+        if isNan(s):
+            new_l.append(math.nan)
+        else:
+            new_l.append(s.replace('【', '[').replace('】', ']'))
+    return new_l
     
 def load_excel(excel_path):
     """
@@ -51,6 +63,8 @@ def load_excel(excel_path):
         col_list = list(df[col])
         if col in round_two_list:
             col_list = preprocess_round_two(col_list)
+        if col == '产品全称':
+            col_list = preprocess_productName(col_list)
         dic[col] = col_list
     
     dic = generate_rest_money(dic)

@@ -20,7 +20,7 @@ dictionary = {
 }
  
 level1 = {
-    1: '圆',
+    1: '元',
     2: '万',
     3: '亿',
     4: '兆'
@@ -124,13 +124,18 @@ def convert(number):
         num_integer = num_split[0]
         num_float = num_split[1]
         ans_int = process_integer(num_integer)
+        
         # Convert integer
         res += convert_integer(ans_int)
+        
         # Convert float
-        res += convert_float(num_float)
+        if number.split('.')[1] == '00':
+            ## 不需要零角零分，直接+整
+            res += '整'  # 所有数字都会+整
+        else:
+            res += convert_float(num_float)
     else:
         ans_int = process_integer(number)
         res += convert_integer(ans_int)
-    res += '整'  # 所有数字都会+整
-    
+        
     return res

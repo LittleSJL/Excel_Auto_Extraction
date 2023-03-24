@@ -5,25 +5,15 @@ Created on Wed Mar 22 17:56:22 2023
 @author: Jinliang
 """
 from word_reader import load_word, save_word
-from excel_reader import load_excel
+from excel_reader import load_excel, isNan
 from docx.oxml.ns import qn
 from convert_number import convert
 import argparse
-import math
 
-# 这些鬼数字好麻烦
-round_two_list = ["应收权益1-本利和", "房屋总价2", "抵债金额（总）", "剩余购房款（不含首付）", 
-                  "乙方1产品1剩余本金", "乙方1产品1剩余收益", "乙方1产品1转让本金", "乙方1产品1转让收益"]
-
-def isNan(item):
-    """
-    判断一个对象是否为nan
-        nan一定是float，如果不是float，则一定不是nan
-        float的情况下，接着使用isnan判断是否为nan
-    """
-    if type(item) == float and math.isnan(item):
-        return True
-    return False
+# 需要保留两位有效数字的列数据
+round_two_list = ["应收权益1-本利和", "房屋总价2", "抵债金额（总）", "剩余购房款（不含首付）",
+                  "对应首付金额（元）", "乙方1产品1剩余本金", "乙方1产品1剩余收益",
+                  "乙方1产品1转让本金", "乙方1产品1转让收益", '房源建面']
 
 
 def replace_value_in_str(para, excel_dic, number):
@@ -58,7 +48,6 @@ def replace_value_in_str(para, excel_dic, number):
                 if key in round_two_list:
                     res = str(format(float(value), ","))
                     ## 这里要强行补充末尾的0
-                    
                     while len(res.split('.')[1]) < 2:
                         res += '0'  # 搞定
                     
@@ -76,7 +65,7 @@ def replace_value_in_str(para, excel_dic, number):
     return para
 
 
-def extract_excel_to_word(word_path, excel_path):
+def extract_excel_to_word(word_path, excel_path, building):
     excel_dic = load_excel(excel_path)
     total_num = len(excel_dic.get('乙方1')) ## 合同总数，但不一定是真实的
     count = 0
@@ -99,6 +88,7 @@ def extract_excel_to_word(word_path, excel_path):
             run = para.runs[0]
             font_name = run.font.name
             font_size = run.font.size
+            if_bold = run.font.bold
             
             para_new = replace_value_in_str(para.text, excel_dic, number)
             if para_new == para.text:
@@ -112,6 +102,7 @@ def extract_excel_to_word(word_path, excel_path):
                 r.set(qn('w:eastAsia'), font_name)
                 
                 run.font.size = font_size
+                run.font.bold = if_bold
                 
         ## 再改table
         for table in word_doc_mode.tables:
@@ -123,6 +114,7 @@ def extract_excel_to_word(word_path, excel_path):
                     
                     font_name = cell.paragraphs[0].runs[0].font.name
                     font_size = cell.paragraphs[0].runs[0].font.size
+                    if_bold = cell.paragraphs[0].runs[0].font.bold
                     
                     cell_new = replace_value_in_str(cell.text, excel_dic, number)
                     cell.text = cell_new
@@ -134,10 +126,14 @@ def extract_excel_to_word(word_path, excel_path):
                             r.set(qn('w:eastAsia'), font_name)
                             
                             run.font.size = font_size
+                            run.font.bold = if_bold
 
         room_number = excel_dic.get('房号')[number]
         name = excel_dic.get('购房人1')[number]
-        file_name = 'DF-00-碧海云天-' + room_number + '-抵房协议-' + name + '.docx'
+        if building == '碧海云天':
+            file_name = 'DF-00-' + building + '-' + room_number + '-抵房协议-' + name + '.docx'
+        else:
+            file_name = 'DF-HUIZ-0-' + building + '-' + room_number + '-抵房协议-' + name + '.docx'
         save_path = 'output/' + file_name
         save_word(word_doc_mode, save_path)
     
@@ -145,14 +141,17 @@ def extract_excel_to_word(word_path, excel_path):
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    # 需要提取的excel文件 - 外部给定
-    parser.add_argument('excel_path', type=str)
+    parser.add_argument('building', type=str) # 楼盘名称：[碧海云天, 云筑]
+    parser.add_argument('excel_path', type=str) # 需要提取的excel文件
     args = parser.parse_args()
     
     print("从【" + args.excel_path + "】中抽取信息，自动填入word模板中...")
     
-    word_path = "data/word_mode.docx"  # 统一的模板
-    extract_excel_to_word(word_path, args.excel_path)
+    if args.building == '碧海云天':
+        word_path = "data/word_mode_bihaiyuntian.docx"  # 统一的模板
+    if args.building == '云筑':
+        word_path = "data/word_mode_yunzhu.docx"  # 统一的模板
+    extract_excel_to_word(word_path, args.excel_path, args.building)
     
     print("全部记录生成完毕，结果已写入output文件夹")
 

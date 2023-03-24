@@ -11,22 +11,6 @@ import pandas as pd
 round_two_list = ["应收权益1-本利和", "房屋总价2", "抵债金额（总）", "剩余购房款（不含首付）", 
                   "乙方1产品1剩余本金", "乙方1产品1剩余收益", "乙方1产品1转让本金", "乙方1产品1转让收益"]
 
-def isNan(item):
-    """
-    判断一个对象是否为nan
-        nan一定是float，如果不是float，则一定不是nan
-        float的情况下，接着使用isnan判断是否为nan
-    """
-    if type(item) == float and math.isnan(item):
-        return True
-    return False
-
-def dropNan(l):
-    """
-    剔除一个list中的nan
-    """
-    return [x for x in l if isNan(x) == False]
-
 def handle_round_two(l):
     """
     一个list中的float，全部保留2位有效数字
@@ -46,7 +30,6 @@ def load_excel(excel_path):
     dic = {}
     for col in columns:
         col_list = list(df[col])
-        col_list = dropNan(col_list)
         if col in round_two_list:
             col_list = handle_round_two(col_list)
         dic[col] = col_list

@@ -9,10 +9,21 @@ from excel_reader import load_excel
 from docx.oxml.ns import qn
 from convert_number import convert
 import argparse
+import math
 
 # 这些鬼数字好麻烦
 round_two_list = ["应收权益1-本利和", "房屋总价2", "抵债金额（总）", "剩余购房款（不含首付）", 
                   "乙方1产品1剩余本金", "乙方1产品1剩余收益", "乙方1产品1转让本金", "乙方1产品1转让收益"]
+
+def isNan(item):
+    """
+    判断一个对象是否为nan
+        nan一定是float，如果不是float，则一定不是nan
+        float的情况下，接着使用isnan判断是否为nan
+    """
+    if type(item) == float and math.isnan(item):
+        return True
+    return False
 
 
 def replace_value_in_str(para, excel_dic, number):
@@ -66,12 +77,19 @@ def replace_value_in_str(para, excel_dic, number):
 
 
 def extract_excel_to_word(word_path, excel_path):
-    word_doc_mode = load_word(word_path)
     excel_dic = load_excel(excel_path)
-
-    total_num = len(excel_dic.get('乙方1')) ## 合同总数
-    print('excel中记录条数：', total_num)
+    total_num = len(excel_dic.get('乙方1')) ## 合同总数，但不一定是真实的
+    count = 0
     for number in range(total_num):
+        # 无内容的记录，直接跳过
+        name = excel_dic.get('乙方1')[number]
+        if isNan(name):
+            continue
+        count += 1
+        
+        # 添加模板
+        word_doc_mode = load_word(word_path)  # 这个东西是要反复添加的
+        
         ## 先改paragraphs
         for para in word_doc_mode.paragraphs:
             if len(para.runs) == 0:
@@ -122,7 +140,9 @@ def extract_excel_to_word(word_path, excel_path):
         file_name = 'DF-00-碧海云天-' + room_number + '-抵房协议-' + name + '.docx'
         save_path = 'output/' + file_name
         save_word(word_doc_mode, save_path)
-
+    
+    print('共生成合同文件数目：', count)
+    
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     # 需要提取的excel文件 - 外部给定

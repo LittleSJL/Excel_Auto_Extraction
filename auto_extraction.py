@@ -129,7 +129,7 @@ def extract_excel_to_word(word_path, excel_path, building):
                             run.font.bold = if_bold
 
         room_number = excel_dic.get('房号')[number]
-        name = excel_dic.get('购房人1')[number]
+        name = excel_dic.get('乙方1')[number]
         if building == '碧海云天':
             file_name = 'DF-00-' + building + '-' + room_number + '-抵房协议-' + name + '.docx'
         else:

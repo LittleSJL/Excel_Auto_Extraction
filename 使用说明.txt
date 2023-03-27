@@ -1,0 +1,11 @@
+【Excel ----> Word合同】
+功能：运行auto_extraction代码，输入excel文件，自动抽取信息生成Word合同
+代码：python auto_extraction.py 楼盘选择【云筑/碧海云天】 excel地址
+	示例：python auto_extraction.py 云筑 data/test_file/云筑.xlsx
+结果：输出到output/word_contract文件夹中
+
+【Excel ----> Excel确认单】
+功能：运行generate_excel代码，输入excel文件，自动抽取信息生成Excel确认单
+代码：python generate_excel.py excel地址
+	示例：python generate_excel.py data/test_file/云筑.xlsx
+结果：输出到output/excel_confirmation文件夹中

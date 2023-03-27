@@ -134,7 +134,7 @@ def extract_excel_to_word(word_path, excel_path, building):
             file_name = 'DF-00-' + building + '-' + room_number + '-抵房协议-' + name + '.docx'
         else:
             file_name = 'DF-HUIZ-0-' + building + '-' + room_number + '-抵房协议-' + name + '.docx'
-        save_path = 'output/' + file_name
+        save_path = 'output/word_contract/' + file_name
         save_word(word_doc_mode, save_path)
     
     print('共生成合同文件数目：', count)
@@ -148,12 +148,12 @@ if __name__ == '__main__':
     print("从【" + args.excel_path + "】中抽取信息，自动填入word模板中...")
     
     if args.building == '碧海云天':
-        word_path = "data/word_mode_bihaiyuntian.docx"  # 统一的模板
+        word_path = "data/word_mode/bihaiyuntian.docx"  # 统一的模板
     if args.building == '云筑':
-        word_path = "data/word_mode_yunzhu.docx"  # 统一的模板
+        word_path = "data/word_mode/yunzhu.docx"  # 统一的模板
     extract_excel_to_word(word_path, args.excel_path, args.building)
     
-    print("全部记录生成完毕，结果已写入output文件夹")
+    print("全部记录生成完毕，结果已写入output/word_contract文件夹")
 
 """
 待解决

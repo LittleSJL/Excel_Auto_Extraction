@@ -132,8 +132,11 @@ def extract_excel_to_word(word_path, excel_path, building):
         name = excel_dic.get('乙方1')[number]
         if building == '碧海云天':
             file_name = 'DF-00-' + building + '-' + room_number + '-抵房协议-' + name + '.docx'
-        else:
+        elif building == '云筑':
             file_name = 'DF-HUIZ-0-' + building + '-' + room_number + '-抵房协议-' + name + '.docx'
+        elif building == '帝景湾':
+            ##　DF-FS-0031-帝景湾-2栋3103抵房协议-陈伟莉.docx
+            file_name = 'DF-FS-0031-' + building + '-' + room_number + '-抵房协议-' + name + '.docx'
         save_path = 'output/word_contract/' + file_name
         save_word(word_doc_mode, save_path)
     
@@ -141,7 +144,7 @@ def extract_excel_to_word(word_path, excel_path, building):
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('building', type=str) # 楼盘名称：[碧海云天, 云筑]
+    parser.add_argument('building', type=str) # 楼盘名称：[碧海云天, 云筑, 帝景湾]
     parser.add_argument('excel_path', type=str) # 需要提取的excel文件
     args = parser.parse_args()
     
@@ -151,14 +154,9 @@ if __name__ == '__main__':
         word_path = "data/word_mode/bihaiyuntian.docx"  # 统一的模板
     if args.building == '云筑':
         word_path = "data/word_mode/yunzhu.docx"  # 统一的模板
+    if args.building == '帝景湾':
+        word_path = "data/word_mode/dijingwan.docx"  # 统一的模板
     extract_excel_to_word(word_path, args.excel_path, args.building)
     
     print("全部记录生成完毕，结果已写入output/word_contract文件夹")
-
-"""
-待解决
-1. 多个乙方的   
-2. 多个产品的
-    要算加和，文字部分可能有点问题，会事先规定好吗，还是批量生成
-"""
 
